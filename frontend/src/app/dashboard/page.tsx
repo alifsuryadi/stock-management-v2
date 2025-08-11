@@ -61,164 +61,164 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
+    <div className="p-4 sm:p-6 lg:p-8 bg-gray-900 min-h-screen">
+      {/* Header */}
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">
+          Dashboard
+        </h1>
+        <p className="text-sm sm:text-base text-gray-400">
+          Overview of your stock management system
+        </p>
+      </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <CubeIcon className="h-6 w-6 text-gray-400" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <div className="card-dark-hover rounded-xl p-4 sm:p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="p-3 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg">
+                <CubeIcon className="h-6 w-6 text-white" />
               </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Total Products
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900">
-                    {stats.totalProducts}
-                  </dd>
-                </dl>
-              </div>
+            </div>
+            <div className="ml-4 w-0 flex-1">
+              <p className="text-sm font-medium text-gray-400 truncate">
+                Total Products
+              </p>
+              <p className="text-2xl font-bold text-white">
+                {stats.totalProducts}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <ExclamationTriangleIcon className="h-6 w-6 text-red-400" />
+        <div className="card-dark-hover rounded-xl p-4 sm:p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="p-3 bg-gradient-to-br from-red-600 to-red-700 rounded-lg">
+                <ExclamationTriangleIcon className="h-6 w-6 text-white" />
               </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Low Stock
-                  </dt>
-                  <dd className="text-lg font-medium text-red-600">
-                    {stats.lowStockProducts}
-                  </dd>
-                </dl>
-              </div>
+            </div>
+            <div className="ml-4 w-0 flex-1">
+              <p className="text-sm font-medium text-gray-400 truncate">
+                Low Stock
+              </p>
+              <p className="text-2xl font-bold text-red-400">
+                {stats.lowStockProducts}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <ArrowTrendingUpIcon className="h-6 w-6 text-green-400" />
+        <div className="card-dark-hover rounded-xl p-4 sm:p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="p-3 bg-gradient-to-br from-green-600 to-green-700 rounded-lg">
+                <ArrowTrendingUpIcon className="h-6 w-6 text-white" />
               </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Stock In Today
-                  </dt>
-                  <dd className="text-lg font-medium text-green-600">
-                    {stats.stockInToday}
-                  </dd>
-                </dl>
-              </div>
+            </div>
+            <div className="ml-4 w-0 flex-1">
+              <p className="text-sm font-medium text-gray-400 truncate">
+                Stock In Today
+              </p>
+              <p className="text-2xl font-bold text-green-400">
+                {stats.stockInToday}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <ArrowTrendingDownIcon className="h-6 w-6 text-red-400" />
+        <div className="card-dark-hover rounded-xl p-4 sm:p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="p-3 bg-gradient-to-br from-orange-600 to-orange-700 rounded-lg">
+                <ArrowTrendingDownIcon className="h-6 w-6 text-white" />
               </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Stock Out Today
-                  </dt>
-                  <dd className="text-lg font-medium text-red-600">
-                    {stats.stockOutToday}
-                  </dd>
-                </dl>
-              </div>
+            </div>
+            <div className="ml-4 w-0 flex-1">
+              <p className="text-sm font-medium text-gray-400 truncate">
+                Stock Out Today
+              </p>
+              <p className="text-2xl font-bold text-orange-400">
+                {stats.stockOutToday}
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Low Stock Alert */}
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-              Low Stock Alert
-            </h3>
-            <div className="space-y-3">
-              {lowStockProducts.length > 0 ? (
-                lowStockProducts.map((product) => (
-                  <div
-                    key={product.id}
-                    className="flex items-center justify-between"
-                  >
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">
-                        {product.name}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {product.category?.name}
-                      </p>
-                    </div>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                      {product.stock} left
-                    </span>
+        <div className="card-dark rounded-xl p-4 sm:p-6">
+          <h3 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6">
+            Low Stock Alert
+          </h3>
+          <div className="space-y-3 sm:space-y-4">
+            {lowStockProducts.length > 0 ? (
+              lowStockProducts.map((product) => (
+                <div
+                  key={product.id}
+                  className="flex items-center justify-between p-3 sm:p-4 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm sm:text-base font-semibold text-white truncate">
+                      {product.name}
+                    </p>
+                    <p className="text-xs sm:text-sm text-gray-400 truncate">
+                      {product.category?.name}
+                    </p>
                   </div>
-                ))
-              ) : (
-                <p className="text-sm text-gray-500">No low stock products</p>
-              )}
-            </div>
+                  <span className="badge-danger px-2 sm:px-3 py-1 rounded-full text-xs font-medium ml-3">
+                    {product.stock} left
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-6 sm:py-8">
+                <p className="text-gray-400">No low stock products</p>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Recent Transactions */}
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-              Recent Transactions
-            </h3>
-            <div className="space-y-3">
-              {recentTransactions.length > 0 ? (
-                recentTransactions.map((transaction) => (
-                  <div
-                    key={transaction.id}
-                    className="flex items-center justify-between"
-                  >
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">
-                        Transaction #{transaction.id}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {new Date(transaction.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        transaction.type === "stock_in"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {transaction.type === "stock_in"
-                        ? "Stock In"
-                        : "Stock Out"}
-                    </span>
+        <div className="card-dark rounded-xl p-4 sm:p-6">
+          <h3 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6">
+            Recent Transactions
+          </h3>
+          <div className="space-y-3 sm:space-y-4">
+            {recentTransactions.length > 0 ? (
+              recentTransactions.map((transaction) => (
+                <div
+                  key={transaction.id}
+                  className="flex items-center justify-between p-3 sm:p-4 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm sm:text-base font-semibold text-white">
+                      Transaction #{transaction.id}
+                    </p>
+                    <p className="text-xs sm:text-sm text-gray-400">
+                      {new Date(transaction.createdAt).toLocaleDateString()}
+                    </p>
                   </div>
-                ))
-              ) : (
-                <p className="text-sm text-gray-500">No recent transactions</p>
-              )}
-            </div>
+                  <span
+                    className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium ml-3 ${
+                      transaction.type === "stock_in"
+                        ? "badge-success"
+                        : "badge-danger"
+                    }`}
+                  >
+                    {transaction.type === "stock_in"
+                      ? "Stock In"
+                      : "Stock Out"}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-6 sm:py-8">
+                <p className="text-gray-400">No recent transactions</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

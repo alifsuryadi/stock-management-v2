@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 import Modal from "@/components/Modal";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import LoadingButton from "@/components/LoadingButton";
+import PasswordInput from "@/components/PasswordInput";
 
 interface AdminFormData {
   firstName: string;
@@ -353,22 +354,14 @@ export default function AdminsPage() {
           </div>
 
           {!editingAdmin && (
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Password *
-              </label>
-              <input
-                type="password"
-                required={!editingAdmin}
-                value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
-                className="input-dark w-full"
-                placeholder="Minimum 6 characters"
-                minLength={6}
-              />
-            </div>
+            <PasswordInput
+              value={formData.password || ""}
+              onChange={(value) => setFormData({ ...formData, password: value })}
+              label="Password"
+              placeholder="Minimum 6 characters"
+              required={!editingAdmin}
+              minLength={6}
+            />
           )}
 
           <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-4">
