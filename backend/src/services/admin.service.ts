@@ -20,7 +20,20 @@ export class AdminService {
     private jwtService: JwtService,
   ) {}
 
-  async create(createAdminDto: CreateAdminDto): Promise<Admin> {
+  /**
+   * Helper function to safely remove password from admin object
+   * @param admin The admin object
+   * @returns Admin object without the password
+   */
+  private toResponseObject(admin: Admin): Omit<Admin, 'password'> {
+    const response = { ...admin };
+    delete response.password;
+    return response;
+  }
+
+  async create(
+    createAdminDto: CreateAdminDto,
+  ): Promise<Omit<Admin, 'password'>> {
     const existingAdmin = await this.adminRepository.findOne({
       where: { email: createAdminDto.email },
     });
@@ -36,28 +49,26 @@ export class AdminService {
     });
 
     const savedAdmin = await this.adminRepository.save(admin);
-    delete savedAdmin.password;
-    return savedAdmin;
+    return this.toResponseObject(savedAdmin);
   }
 
-  async findAll(): Promise<Admin[]> {
+  async findAll(): Promise<Omit<Admin, 'password'>[]> {
     const admins = await this.adminRepository.find();
-    return admins.map((admin) => {
-      delete admin.password;
-      return admin;
-    });
+    return admins.map((admin) => this.toResponseObject(admin));
   }
 
-  async findOne(id: number): Promise<Admin> {
+  async findOne(id: number): Promise<Omit<Admin, 'password'>> {
     const admin = await this.adminRepository.findOne({ where: { id } });
     if (!admin) {
       throw new NotFoundException('Admin not found');
     }
-    delete admin.password;
-    return admin;
+    return this.toResponseObject(admin);
   }
 
-  async update(id: number, updateAdminDto: UpdateAdminDto): Promise<Admin> {
+  async update(
+    id: number,
+    updateAdminDto: UpdateAdminDto,
+  ): Promise<Omit<Admin, 'password'>> {
     const admin = await this.adminRepository.findOne({ where: { id } });
     if (!admin) {
       throw new NotFoundException('Admin not found');
@@ -72,41 +83,60 @@ export class AdminService {
       }
     }
 
-    await this.adminRepository.update(id, updateAdminDto);
+    // Create a mutable copy that can include the password property for hashing.
+    // This resolves the TypeScript error as `UpdateAdminDto` doesn't have `password`.
+    const updatePayload: Partial<Admin> = { ...updateAdminDto };
+
+    // Only hash password if it's being updated
+    if (updatePayload.password) {
+      updatePayload.password = await bcrypt.hash(updatePayload.password, 10);
+    }
+
+    await this.adminRepository.update(id, updatePayload);
+    // findOne will return the updated admin without the password
     return this.findOne(id);
   }
 
   async remove(id: number): Promise<void> {
-    const admin = await this.adminRepository.findOne({ where: { id } });
-    if (!admin) {
+    const result = await this.adminRepository.delete(id);
+    if (result.affected === 0) {
       throw new NotFoundException('Admin not found');
     }
-    await this.adminRepository.delete(id);
   }
 
   async login(
     loginDto: LoginDto,
-  ): Promise<{ access_token: string; admin: Admin }> {
+  ): Promise<{ access_token: string; admin: Omit<Admin, 'password'> }> {
     const admin = await this.adminRepository.findOne({
       where: { email: loginDto.email },
+      // Explicitly select the password field for comparison
+      select: [
+        'id',
+        'firstName',
+        'lastName',
+        'email',
+        'birthDate',
+        'gender',
+        'password',
+        'createdAt',
+        'updatedAt',
+      ],
     });
 
-    if (!admin || !(await bcrypt.compare(loginDto.password, admin.password))) {
+    if (!admin || !(await bcrypt.compare(loginDto.password, admin.password!))) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
     const payload = { sub: admin.id, email: admin.email };
     const access_token = this.jwtService.sign(payload);
 
-    delete admin.password;
-    return { access_token, admin };
+    return { access_token, admin: this.toResponseObject(admin) };
   }
 
-  async validateUser(id: number): Promise<Admin> {
+  async validateUser(id: number): Promise<Omit<Admin, 'password'> | null> {
     const admin = await this.adminRepository.findOne({ where: { id } });
     if (admin) {
-      delete admin.password;
-      return admin;
+      return this.toResponseObject(admin);
     }
     return null;
   }

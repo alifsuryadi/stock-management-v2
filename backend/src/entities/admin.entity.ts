@@ -1,3 +1,4 @@
+// backend/src/entities/admin.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -28,8 +29,8 @@ export class Admin {
   @Column({ type: 'enum', enum: ['male', 'female'] })
   gender: string;
 
-  @Column()
-  password: string;
+  @Column({ select: false })
+  password?: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

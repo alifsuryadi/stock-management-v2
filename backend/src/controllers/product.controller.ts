@@ -28,7 +28,7 @@ export class ProductController {
     @Body() createProductDto: CreateProductDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const imageUrl = file ? `/uploads/${file.filename}` : null;
+    const imageUrl = file ? `/uploads/${file.filename}` : undefined;
     return this.productService.create(createProductDto, imageUrl);
   }
 
@@ -49,7 +49,7 @@ export class ProductController {
     @Body() updateProductDto: UpdateProductDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const imageUrl = file ? `/uploads/${file.filename}` : null;
+    const imageUrl = file ? `/uploads/${file.filename}` : undefined;
     return this.productService.update(+id, updateProductDto, imageUrl);
   }
 

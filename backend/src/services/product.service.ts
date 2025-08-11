@@ -50,7 +50,7 @@ export class ProductService {
       throw new NotFoundException('Product not found');
     }
 
-    const updateData = { ...updateProductDto };
+    const updateData: Partial<Product> = { ...updateProductDto };
     if (imageUrl) {
       updateData.imageUrl = imageUrl;
     }

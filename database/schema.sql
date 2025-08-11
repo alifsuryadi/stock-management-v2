@@ -1,6 +1,6 @@
 -- database/schema.sql
-CREATE DATABASE stock_management;
-USE stock_management;
+CREATE DATABASE stock_management_v2;
+USE stock_management_v2;
 
 -- Admin table
 CREATE TABLE admins (
@@ -57,12 +57,21 @@ CREATE TABLE transaction_items (
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
--- Insert default admin
+-- Insert default admin (password: admin123)
 INSERT INTO admins (first_name, last_name, email, birth_date, gender, password) 
-VALUES ('Admin', 'System', 'admin@example.com', '1990-01-01', 'male', '$2b$10$9RgXe.9t0vJZ5Y1XJ.Xk1.eB4K.3F.5N.7D.9V.1W.3S.5T.7U.9Y.1Z');
+VALUES ('Admin', 'System', 'admin@example.com', '1990-01-01', 'male', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi');
 
 -- Insert sample categories
 INSERT INTO product_categories (name, description) VALUES 
 ('Electronics', 'Electronic devices and gadgets'),
 ('Clothing', 'Apparel and fashion items'),
 ('Books', 'Books and educational materials');
+
+-- Insert sample products
+INSERT INTO products (name, description, category_id, stock) VALUES 
+('iPhone 15', 'Latest Apple smartphone', 1, 50),
+('Samsung Galaxy S24', 'High-end Android phone', 1, 30),
+('T-Shirt Basic', 'Cotton basic t-shirt', 2, 100),
+('Jeans Denim', 'Classic blue jeans', 2, 75),
+('The Art of Programming', 'Programming fundamentals book', 3, 25),
+('Clean Code', 'Best practices in software development', 3, 40);
