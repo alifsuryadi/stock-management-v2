@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Transaction } from '../entities/transaction.entity';
 import { TransactionItem } from '../entities/transaction-item.entity';
+import { Product } from '../entities/product.entity';
 import { CreateTransactionDto } from '../dto/transaction.dto';
 import { ProductService } from './product.service';
 
@@ -34,10 +35,15 @@ export class TransactionService {
       // Validate stock for stock_out transactions
       if (createTransactionDto.type === 'stock_out') {
         for (const item of createTransactionDto.items) {
-          const product = await this.productService.findOne(item.productId);
+          const product = await queryRunner.manager.findOne(Product, {
+            where: { id: item.productId },
+          });
+          if (!product) {
+            throw new NotFoundException(`Product with ID ${item.productId} not found`);
+          }
           if (product.stock < item.quantity) {
             throw new BadRequestException(
-              `Insufficient stock for product: ${product.name}`,
+              `Insufficient stock for product: ${product.name}. Available: ${product.stock}, Required: ${item.quantity}`,
             );
           }
         }
@@ -60,14 +66,29 @@ export class TransactionService {
         });
         await queryRunner.manager.save(transactionItem);
 
-        // Update product stock
-        const stockType =
-          createTransactionDto.type === 'stock_in' ? 'increase' : 'decrease';
-        await this.productService.updateStock(
-          item.productId,
-          item.quantity,
-          stockType,
-        );
+        // Update product stock using queryRunner manager to avoid lock conflicts
+        const product = await queryRunner.manager.findOne(Product, {
+          where: { id: item.productId },
+        });
+        
+        if (!product) {
+          throw new NotFoundException(`Product with ID ${item.productId} not found`);
+        }
+
+        const newStock =
+          createTransactionDto.type === 'stock_in'
+            ? product.stock + item.quantity
+            : product.stock - item.quantity;
+
+        if (newStock < 0) {
+          throw new BadRequestException(
+            `Insufficient stock for product: ${product.name}. Available: ${product.stock}, Required: ${item.quantity}`,
+          );
+        }
+
+        await queryRunner.manager.update(Product, item.productId, { 
+          stock: newStock 
+        });
       }
 
       await queryRunner.commitTransaction();
