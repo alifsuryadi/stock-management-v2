@@ -207,7 +207,7 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className="p-6 bg-gray-900">
+    <div className="p-6 bg-gray-900 min-h-screen">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>

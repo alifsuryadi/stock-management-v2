@@ -26,7 +26,7 @@ export default function Layout({ children }: LayoutProps) {
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-900">
       <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
       
       <div className="flex flex-col flex-1 lg:ml-0">

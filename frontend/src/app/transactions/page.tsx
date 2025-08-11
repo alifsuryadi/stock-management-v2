@@ -121,7 +121,7 @@ export default function TransactionsPage() {
 
   if (fetchingProducts) {
     return (
-      <div className="p-6 bg-gray-900">
+      <div className="p-6 bg-gray-900 min-h-screen">
         <div className="animate-pulse">
           <div className="h-8 bg-gray-700 rounded mb-6 animate-shimmer"></div>
           <div className="card-dark rounded-xl p-8">
@@ -137,7 +137,7 @@ export default function TransactionsPage() {
   }
 
   return (
-    <div className="p-6 bg-gray-900">
+    <div className="p-6 bg-gray-900 min-h-screen">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
