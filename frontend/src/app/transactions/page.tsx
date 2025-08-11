@@ -1,10 +1,16 @@
 // frontend/src/app/transactions/page.tsx
 "use client";
 import { useEffect, useState } from "react";
-import { PlusIcon } from "@heroicons/react/24/outline";
+import {
+  PlusIcon,
+  TrashIcon,
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
+} from "@heroicons/react/24/outline";
 import api from "@/lib/api";
 import { Product } from "@/types";
 import toast from "react-hot-toast";
+import LoadingButton from "@/components/LoadingButton";
 
 export default function TransactionsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -16,6 +22,7 @@ export default function TransactionsPage() {
   >([]);
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fetchingProducts, setFetchingProducts] = useState(true);
 
   useEffect(() => {
     fetchProducts();
@@ -25,8 +32,10 @@ export default function TransactionsPage() {
     try {
       const response = await api.get("/products");
       setProducts(response.data);
-    } catch {
+    } catch (_error) {
       toast.error("Failed to fetch products");
+    } finally {
+      setFetchingProducts(false);
     }
   };
 
@@ -48,6 +57,16 @@ export default function TransactionsPage() {
     setSelectedProducts(selectedProducts.filter((_, i) => i !== index));
   };
 
+  const getProductStock = (productId: number): number => {
+    const product = products.find((p) => p.id === productId);
+    return product?.stock || 0;
+  };
+
+  const getProductName = (productId: number): string => {
+    const product = products.find((p) => p.id === productId);
+    return product?.name || "";
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedProducts.length === 0) {
@@ -55,20 +74,44 @@ export default function TransactionsPage() {
       return;
     }
 
+    const validProducts = selectedProducts.filter((item) => item.productId > 0);
+    if (validProducts.length === 0) {
+      toast.error("Please select valid products");
+      return;
+    }
+
+    // Validate stock for stock_out transactions
+    if (transactionType === "stock_out") {
+      for (const item of validProducts) {
+        const availableStock = getProductStock(item.productId);
+        if (item.quantity > availableStock) {
+          const productName = getProductName(item.productId);
+          toast.error(
+            `Insufficient stock for ${productName}. Available: ${availableStock}`
+          );
+          return;
+        }
+      }
+    }
+
     setLoading(true);
     try {
       await api.post("/transactions", {
         type: transactionType,
-        items: selectedProducts.filter((item) => item.productId > 0),
+        items: validProducts,
         notes: notes || undefined,
       });
-      toast.success("Transaction created successfully");
+      toast.success(
+        `${
+          transactionType === "stock_in" ? "Stock In" : "Stock Out"
+        } transaction completed successfully! 🎉`
+      );
       setSelectedProducts([]);
       setNotes("");
       fetchProducts(); // Refresh to get updated stock
-    } catch (error) {
-      const errorMessage = error instanceof Error && 'response' in error
-        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
+    } catch (error: unknown) {
+      const errorMessage = error && typeof error === 'object' && 'response' in error 
+        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message 
         : undefined;
       toast.error(errorMessage || "Failed to create transaction");
     } finally {
@@ -76,149 +119,238 @@ export default function TransactionsPage() {
     }
   };
 
+  if (fetchingProducts) {
+    return (
+      <div className="p-6 bg-gray-900">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-700 rounded mb-6 animate-shimmer"></div>
+          <div className="card-dark rounded-xl p-8">
+            <div className="space-y-4">
+              <div className="h-6 bg-gray-700 rounded animate-shimmer"></div>
+              <div className="h-32 bg-gray-700 rounded animate-shimmer"></div>
+              <div className="h-20 bg-gray-700 rounded animate-shimmer"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Create Transaction</h1>
-        <div className="flex space-x-2">
+    <div className="p-6 bg-gray-900">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-white mb-2">
+            Create Transaction
+          </h1>
+          <p className="text-gray-400">
+            Manage inventory with stock in and stock out transactions
+          </p>
+        </div>
+        <div className="flex space-x-3">
           <button
             onClick={() => setTransactionType("stock_in")}
-            className={`px-4 py-2 rounded-md text-sm font-medium ${
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all ${
               transactionType === "stock_in"
-                ? "bg-green-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                ? "bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg shadow-green-500/25"
+                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
             }`}
           >
-            Stock In
+            <ArrowTrendingUpIcon className="h-5 w-5" />
+            <span>Stock In</span>
           </button>
           <button
             onClick={() => setTransactionType("stock_out")}
-            className={`px-4 py-2 rounded-md text-sm font-medium ${
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all ${
               transactionType === "stock_out"
-                ? "bg-red-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/25"
+                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
             }`}
           >
-            Stock Out
+            <ArrowTrendingDownIcon className="h-5 w-5" />
+            <span>Stock Out</span>
           </button>
         </div>
       </div>
 
-      <div className="bg-white shadow rounded-lg p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Transaction Type
-            </label>
-            <div
-              className={`px-3 py-2 border rounded-md ${
-                transactionType === "stock_in"
-                  ? "border-green-300 bg-green-50"
-                  : "border-red-300 bg-red-50"
-              }`}
-            >
-              <span
-                className={`text-sm font-medium ${
-                  transactionType === "stock_in"
-                    ? "text-green-800"
-                    : "text-red-800"
-                }`}
-              >
-                {transactionType === "stock_in"
-                  ? "Stock In - Adding products to inventory"
-                  : "Stock Out - Removing products from inventory"}
-              </span>
+      {/* Transaction Form */}
+      <div className="card-dark rounded-xl p-8">
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Transaction Type Indicator */}
+          <div
+            className={`p-4 rounded-xl border ${
+              transactionType === "stock_in"
+                ? "bg-green-900/20 border-green-700/50"
+                : "bg-red-900/20 border-red-700/50"
+            }`}
+          >
+            <div className="flex items-center space-x-3">
+              {transactionType === "stock_in" ? (
+                <ArrowTrendingUpIcon className="h-6 w-6 text-green-400" />
+              ) : (
+                <ArrowTrendingDownIcon className="h-6 w-6 text-red-400" />
+              )}
+              <div>
+                <h3
+                  className={`font-semibold ${
+                    transactionType === "stock_in"
+                      ? "text-green-300"
+                      : "text-red-300"
+                  }`}
+                >
+                  {transactionType === "stock_in"
+                    ? "Stock In Transaction"
+                    : "Stock Out Transaction"}
+                </h3>
+                <p
+                  className={`text-sm ${
+                    transactionType === "stock_in"
+                      ? "text-green-400"
+                      : "text-red-400"
+                  }`}
+                >
+                  {transactionType === "stock_in"
+                    ? "Adding products to inventory"
+                    : "Removing products from inventory"}
+                </p>
+              </div>
             </div>
           </div>
 
+          {/* Products Section */}
           <div>
-            <div className="flex justify-between items-center mb-3">
-              <label className="block text-sm font-medium text-gray-700">
+            <div className="flex justify-between items-center mb-4">
+              <label className="block text-lg font-semibold text-white">
                 Products
               </label>
               <button
                 type="button"
                 onClick={addProductToTransaction}
-                className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 flex items-center"
+                className="btn-primary flex items-center space-x-2"
               >
-                <PlusIcon className="h-4 w-4 mr-1" />
-                Add Product
+                <PlusIcon className="h-4 w-4" />
+                <span>Add Product</span>
               </button>
             </div>
 
-            <div className="space-y-3">
-              {selectedProducts.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex items-center space-x-3 p-3 border rounded-md bg-gray-50"
-                >
-                  <select
-                    value={item.productId}
-                    onChange={(e) =>
-                      updateSelectedProduct(
-                        index,
-                        "productId",
-                        parseInt(e.target.value)
-                      )
-                    }
-                    className="flex-1 border border-gray-300 rounded-md px-3 py-2"
-                    required
+            <div className="space-y-4">
+              {selectedProducts.map((item, index) => {
+                const selectedProduct = products.find(
+                  (p) => p.id === item.productId
+                );
+                const maxQuantity =
+                  transactionType === "stock_out"
+                    ? selectedProduct?.stock || 0
+                    : 9999;
+
+                return (
+                  <div
+                    key={index}
+                    className="flex items-center space-x-4 p-4 bg-gray-800/50 rounded-lg border border-gray-700"
                   >
-                    <option value={0}>Select Product</option>
-                    {products.map((product) => (
-                      <option key={product.id} value={product.id}>
-                        {product.name} (Stock: {product.stock})
-                      </option>
-                    ))}
-                  </select>
-                  <input
-                    type="number"
-                    min="1"
-                    value={item.quantity}
-                    onChange={(e) =>
-                      updateSelectedProduct(
-                        index,
-                        "quantity",
-                        parseInt(e.target.value) || 1
-                      )
-                    }
-                    className="w-20 border border-gray-300 rounded-md px-3 py-2"
-                    placeholder="Qty"
-                    required
-                  />
+                    <div className="flex-1">
+                      <select
+                        value={item.productId}
+                        onChange={(e) =>
+                          updateSelectedProduct(
+                            index,
+                            "productId",
+                            parseInt(e.target.value)
+                          )
+                        }
+                        className="select-dark w-full"
+                        required
+                      >
+                        <option value={0}>Select Product</option>
+                        {products.map((product) => (
+                          <option key={product.id} value={product.id}>
+                            {product.name} (Stock: {product.stock})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="w-32">
+                      <input
+                        type="number"
+                        min="1"
+                        max={maxQuantity}
+                        value={item.quantity}
+                        onChange={(e) =>
+                          updateSelectedProduct(
+                            index,
+                            "quantity",
+                            parseInt(e.target.value) || 1
+                          )
+                        }
+                        className="input-dark w-full text-center"
+                        placeholder="Qty"
+                        required
+                      />
+                    </div>
+
+                    {selectedProduct && transactionType === "stock_out" && (
+                      <div className="text-xs text-gray-400 w-20 text-center">
+                        Max: {selectedProduct.stock}
+                      </div>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => removeProductFromTransaction(index)}
+                      className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-colors"
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                    </button>
+                  </div>
+                );
+              })}
+
+              {selectedProducts.length === 0 && (
+                <div className="text-center py-8 border-2 border-dashed border-gray-600 rounded-lg">
+                  <p className="text-gray-400 mb-4">No products added yet</p>
                   <button
                     type="button"
-                    onClick={() => removeProductFromTransaction(index)}
-                    className="text-red-600 hover:text-red-800"
+                    onClick={addProductToTransaction}
+                    className="btn-primary"
                   >
-                    Remove
+                    Add Your First Product
                   </button>
                 </div>
-              ))}
+              )}
             </div>
           </div>
 
+          {/* Notes Section */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-lg font-semibold text-white mb-3">
               Notes (Optional)
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              rows={4}
+              className="textarea-dark w-full"
               placeholder="Add any notes about this transaction..."
             />
           </div>
 
-          <div className="flex justify-end">
-            <button
+          {/* Submit Section */}
+          <div className="flex justify-end pt-6 border-t border-gray-700">
+            <LoadingButton
               type="submit"
-              disabled={loading || selectedProducts.length === 0}
-              className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              loading={loading}
+              variant="primary"
+              disabled={selectedProducts.length === 0}
+              className="px-8 py-3 text-base"
             >
-              {loading ? "Creating..." : "Create Transaction"}
-            </button>
+              {loading
+                ? "Processing..."
+                : `Complete ${
+                    transactionType === "stock_in" ? "Stock In" : "Stock Out"
+                  }`}
+            </LoadingButton>
           </div>
         </form>
       </div>
