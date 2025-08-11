@@ -1,3 +1,4 @@
+// backend/src/entities/product-category.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,

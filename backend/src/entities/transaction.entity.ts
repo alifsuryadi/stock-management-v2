@@ -1,3 +1,4 @@
+// backend/src/entities/transaction.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,

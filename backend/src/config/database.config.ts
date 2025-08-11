@@ -1,3 +1,4 @@
+// backend/src/config/database.config.ts
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 

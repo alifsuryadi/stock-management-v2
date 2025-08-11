@@ -20,7 +20,9 @@ export class AdminService {
     private jwtService: JwtService,
   ) {}
 
-  async create(createAdminDto: CreateAdminDto): Promise<Admin> {
+  async create(
+    createAdminDto: CreateAdminDto,
+  ): Promise<Omit<Admin, 'password'>> {
     const existingAdmin = await this.adminRepository.findOne({
       where: { email: createAdminDto.email },
     });
@@ -36,28 +38,28 @@ export class AdminService {
     });
 
     const savedAdmin = await this.adminRepository.save(admin);
-    delete savedAdmin.password;
-    return savedAdmin;
+    const { password, ...adminWithoutPassword } = savedAdmin;
+    return adminWithoutPassword;
   }
 
-  async findAll(): Promise<Admin[]> {
+  async findAll(): Promise<Omit<Admin, 'password'>[]> {
     const admins = await this.adminRepository.find();
-    return admins.map((admin) => {
-      delete admin.password;
-      return admin;
-    });
+    return admins.map(({ password, ...admin }) => admin);
   }
 
-  async findOne(id: number): Promise<Admin> {
+  async findOne(id: number): Promise<Omit<Admin, 'password'>> {
     const admin = await this.adminRepository.findOne({ where: { id } });
     if (!admin) {
       throw new NotFoundException('Admin not found');
     }
-    delete admin.password;
-    return admin;
+    const { password, ...adminWithoutPassword } = admin;
+    return adminWithoutPassword;
   }
 
-  async update(id: number, updateAdminDto: UpdateAdminDto): Promise<Admin> {
+  async update(
+    id: number,
+    updateAdminDto: UpdateAdminDto,
+  ): Promise<Omit<Admin, 'password'>> {
     const admin = await this.adminRepository.findOne({ where: { id } });
     if (!admin) {
       throw new NotFoundException('Admin not found');
@@ -86,27 +88,38 @@ export class AdminService {
 
   async login(
     loginDto: LoginDto,
-  ): Promise<{ access_token: string; admin: Admin }> {
+  ): Promise<{ access_token: string; admin: Omit<Admin, 'password'> }> {
     const admin = await this.adminRepository.findOne({
       where: { email: loginDto.email },
+      select: [
+        'id',
+        'firstName',
+        'lastName',
+        'email',
+        'birthDate',
+        'gender',
+        'password',
+        'createdAt',
+        'updatedAt',
+      ],
     });
 
-    if (!admin || !(await bcrypt.compare(loginDto.password, admin.password))) {
+    if (!admin || !(await bcrypt.compare(loginDto.password, admin.password!))) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
     const payload = { sub: admin.id, email: admin.email };
     const access_token = this.jwtService.sign(payload);
 
-    delete admin.password;
-    return { access_token, admin };
+    const { password, ...adminWithoutPassword } = admin;
+    return { access_token, admin: adminWithoutPassword };
   }
 
-  async validateUser(id: number): Promise<Admin> {
+  async validateUser(id: number): Promise<Omit<Admin, 'password'> | null> {
     const admin = await this.adminRepository.findOne({ where: { id } });
     if (admin) {
-      delete admin.password;
-      return admin;
+      const { password, ...adminWithoutPassword } = admin;
+      return adminWithoutPassword;
     }
     return null;
   }
