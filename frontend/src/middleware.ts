@@ -5,7 +5,8 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
   const isAuthPage = request.nextUrl.pathname === "/login";
-  const isProtectedRoute = !isAuthPage && request.nextUrl.pathname !== "/";
+  const isRootPage = request.nextUrl.pathname === "/";
+  const isProtectedRoute = !isAuthPage && !isRootPage;
 
   if (!token && isProtectedRoute) {
     return NextResponse.redirect(new URL("/login", request.url));

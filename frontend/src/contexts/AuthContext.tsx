@@ -37,7 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const response = await api.get("/admin/profile");
       setAdmin(response.data);
-    } catch {
+    } catch (error) {
       Cookies.remove("token");
     } finally {
       setLoading(false);
