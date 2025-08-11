@@ -8,6 +8,13 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
+
+interface AuthenticatedRequest extends Request {
+  user: {
+    sub: number;
+    email: string;
+  };
+}
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { TransactionService } from '../services/transaction.service';
 import { CreateTransactionDto } from '../dto/transaction.dto';
@@ -18,7 +25,10 @@ export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
 
   @Post()
-  create(@Body() createTransactionDto: CreateTransactionDto, @Request() req) {
+  create(
+    @Body() createTransactionDto: CreateTransactionDto,
+    @Request() req: AuthenticatedRequest,
+  ) {
     return this.transactionService.create(createTransactionDto, req.user.sub);
   }
 

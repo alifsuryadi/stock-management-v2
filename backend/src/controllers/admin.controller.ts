@@ -10,6 +10,13 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
+
+interface AuthenticatedRequest extends Request {
+  user: {
+    sub: number;
+    email: string;
+  };
+}
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { AdminService } from '../services/admin.service';
 import { CreateAdminDto, UpdateAdminDto, LoginDto } from '../dto/admin.dto';
@@ -30,13 +37,16 @@ export class AdminController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Request() req) {
+  getProfile(@Request() req: AuthenticatedRequest) {
     return this.adminService.findOne(req.user.sub);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('profile')
-  updateProfile(@Request() req, @Body() updateAdminDto: UpdateAdminDto) {
+  updateProfile(
+    @Request() req: AuthenticatedRequest,
+    @Body() updateAdminDto: UpdateAdminDto,
+  ) {
     return this.adminService.update(req.user.sub, updateAdminDto);
   }
 
