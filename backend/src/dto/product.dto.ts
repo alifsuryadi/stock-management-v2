@@ -1,6 +1,6 @@
 // backend/src/dto/product.dto.ts
 import { IsString, IsNumber, IsOptional, Min } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
 
 export class CreateProductDto {
   @IsString()
@@ -10,20 +10,28 @@ export class CreateProductDto {
   @IsString()
   description?: string;
 
-  @Transform(({ value }) => {
+  @Transform(({ value }): number => {
+    if (typeof value === 'number') return value;
     const parsed = parseInt(value);
-    return isNaN(parsed) ? value : parsed;
+    if (isNaN(parsed)) {
+      throw new Error('Invalid categoryId format');
+    }
+    return parsed;
   })
   @IsNumber()
   categoryId: number;
 
   @IsOptional()
-  @Transform(({ value }) => {
+  @Transform(({ value }): number | undefined => {
     if (value === undefined || value === null || value === '') {
       return undefined;
     }
+    if (typeof value === 'number') return value;
     const parsed = parseInt(value);
-    return isNaN(parsed) ? value : parsed;
+    if (isNaN(parsed)) {
+      throw new Error('Invalid stock format');
+    }
+    return parsed;
   })
   @IsNumber()
   @Min(0)
@@ -40,23 +48,31 @@ export class UpdateProductDto {
   description?: string;
 
   @IsOptional()
-  @Transform(({ value }) => {
+  @Transform(({ value }): number | undefined => {
     if (value === undefined || value === null || value === '') {
       return undefined;
     }
+    if (typeof value === 'number') return value;
     const parsed = parseInt(value);
-    return isNaN(parsed) ? value : parsed;
+    if (isNaN(parsed)) {
+      throw new Error('Invalid categoryId format');
+    }
+    return parsed;
   })
   @IsNumber()
   categoryId?: number;
 
   @IsOptional()
-  @Transform(({ value }) => {
+  @Transform(({ value }): number | undefined => {
     if (value === undefined || value === null || value === '') {
       return undefined;
     }
+    if (typeof value === 'number') return value;
     const parsed = parseInt(value);
-    return isNaN(parsed) ? value : parsed;
+    if (isNaN(parsed)) {
+      throw new Error('Invalid stock format');
+    }
+    return parsed;
   })
   @IsNumber()
   @Min(0)
