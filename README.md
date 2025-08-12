@@ -6,7 +6,7 @@ Modern stock management application built with Next.js and NestJS, featuring rea
 
 ![Preview](./public/overview-stock-management-v2.gif)
 
-## Features
+## ✨ Features
 
 - **Modern UI**: Clean, responsive interface built with Next.js and Tailwind CSS
 - **Authentication**: Secure JWT-based authentication system
@@ -18,7 +18,7 @@ Modern stock management application built with Next.js and NestJS, featuring rea
 - **Dark Theme**: Modern dark theme interface
 - **Responsive Design**: Works perfectly on desktop and mobile devices
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 ### Frontend
 
@@ -56,7 +56,7 @@ Before you begin, ensure you have the following installed:
 - **MySQL** (v8.0 or higher)
 - **Git**
 
-## Installation & Setup
+## 🚀 Installation & Setup
 
 ### 1. Clone the Repository
 
@@ -167,7 +167,7 @@ npm run start
 
 Frontend will run on: `http://localhost:3000`
 
-## Usage
+## 🎮 Usage
 
 ### 1. Access the Application
 
@@ -189,7 +189,7 @@ Use the demo credentials that appear in the toast notification:
 - **History**: View complete transaction history
 - **Admins**: Manage system administrators
 
-## Project Structure
+## 📝 Project Structure
 
 ```
 stock-management-v2/
@@ -221,7 +221,7 @@ stock-management-v2/
 
 ```
 
-## Testing
+## 🧪 Testing
 
 ### Backend Tests
 
@@ -250,7 +250,7 @@ npm run lint
 npm run build
 ```
 
-## =' Development Commands
+## 📦 Development Commands
 
 ### Backend
 
@@ -284,7 +284,7 @@ npm run start
 npm run lint
 ```
 
-## API Endpoints
+## 🔗 API Endpoints
 
 ### Authentication
 
@@ -320,7 +320,7 @@ npm run lint
 - `POST /transactions` - Create transaction
 - `GET /transactions/:id` - Get transaction by ID
 
-## = Security Features
+## 🤖 Security Features
 
 - **JWT Authentication**: Secure token-based authentication
 - **Password Hashing**: bcrypt for secure password storage
@@ -357,7 +357,7 @@ Make sure to update environment variables for production:
 - Set appropriate CORS origins
 - Use HTTPS in production
 
-## Contributing
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -371,7 +371,7 @@ Project ini menggunakan **MIT License**. Silakan lihat file [LICENSE](LICENSE) u
 
 ---
 
-## Troubleshooting
+## 😵‍💫 Troubleshooting
 
 ### Common Issues
 
